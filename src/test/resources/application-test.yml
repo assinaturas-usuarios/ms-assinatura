@@ -1,0 +1,18 @@
+spring:
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+  flyway:
+    enabled: false
+  data:
+    redis:
+      host: localhost
+      port: 6370
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: assinatura-test-group
+
+ms-usuario:
+  url: http://localhost:8081

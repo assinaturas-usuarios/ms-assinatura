@@ -1,0 +1,29 @@
+<configuration>
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+      <includeMdcKeyName>traceId</includeMdcKeyName>
+      <includeMdcKeyName>spanId</includeMdcKeyName>
+    </encoder>
+  </appender>
+
+  <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+    <destination>${LOGSTASH_HOST:-logstash}:5000</destination>
+    <reconnectionDelay>10 seconds</reconnectionDelay>
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+      <includeMdcKeyName>traceId</includeMdcKeyName>
+      <includeMdcKeyName>spanId</includeMdcKeyName>
+    </encoder>
+  </appender>
+
+  <logger additivity="false" level="DEBUG" name="com.empresa.usuario">
+    <appender-ref ref="STDOUT"/>
+    <appender-ref ref="LOGSTASH"/>
+  </logger>
+
+  <root level="INFO">
+    <appender-ref ref="STDOUT"/>
+    <appender-ref ref="LOGSTASH"/>
+  </root>
+
+  <springProperty name="appName" scope="context" source="spring.application.name"/>
+</configuration>

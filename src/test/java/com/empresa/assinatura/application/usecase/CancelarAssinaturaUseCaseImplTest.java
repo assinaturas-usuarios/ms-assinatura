@@ -36,7 +36,7 @@ class CancelarAssinaturaUseCaseImplTest {
   @Mock
   private AssinaturaCachePort cache;
   @Mock
-  private AssinaturaProducerPort eventPublisher;
+  private AssinaturaProducerPort assinaturaProducer;
   @Mock
   private AssinaturaMapper mapper;
   @InjectMocks
@@ -64,7 +64,7 @@ class CancelarAssinaturaUseCaseImplTest {
       given(repository.salvar(any())).willReturn(Mono.just(assinatura));
       given(mapper.toResponse(any())).willReturn(response);
       given(cache.invalidar(any())).willReturn(Mono.empty());
-      given(eventPublisher.publicarAssinaturaCancelada(any())).willReturn(Mono.empty());
+      given(assinaturaProducer.publicarAssinaturaCancelada(any())).willReturn(Mono.empty());
 
       StepVerifier.create(useCase.cancelar(id))
           .expectNextMatches(r -> StatusAssinatura.CANCELADA.equals(r.status()))

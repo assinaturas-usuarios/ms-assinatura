@@ -39,7 +39,8 @@ public class AssinaturaController implements AssinaturaSwagger {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public Mono<AssinaturaResponse> criar(@Valid @RequestBody CriarAssinaturaRequest request) {
-    log.info("Recebendo POST request de criação de assinatura, usuário ID: {}", request.usuarioId());
+    log.info("Recebendo POST request de criação de assinatura, usuário ID: {}",
+        request.usuarioId());
     return criarUseCase.criar(request);
   }
 
@@ -64,7 +65,8 @@ public class AssinaturaController implements AssinaturaSwagger {
       @RequestParam(required = false) String status,
       @RequestParam(required = false) String plano,
       @RequestParam(defaultValue = "20") int tamanho) {
-    log.info("Recebendo GET request de busca de assinaturas paginadas por status {} ou plano {}", status, plano);
+    log.info("Recebendo GET request de busca de assinaturas paginadas por status {} ou plano {}",
+        status, plano);
     return buscarUseCase.listar(cursor, status, plano, tamanho);
   }
 

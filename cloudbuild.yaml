@@ -1,0 +1,49 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-image'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REPO}/ms-assinatura:${SHORT_SHA}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REPO}/ms-assinatura:latest'
+      - '.'
+    env:
+      - 'DOCKER_BUILDKIT=1'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-image'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REPO}/ms-assinatura:${SHORT_SHA}'
+    waitFor:
+      - 'build-image'
+
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    args:
+      - 'run'
+      - '--filename=.'
+      - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REPO}/ms-assinatura:${SHORT_SHA}'
+      - '--location=${_REGION}'
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=${_REGION}'
+      - 'CLOUDSDK_RUN_PLATFORM=managed'
+
+images:
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REPO}/ms-assinatura:${SHORT_SHA}'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REPO}/ms-assinatura:latest'
+
+substitutions:
+  _REGION: 'us-central1'
+  _ARTIFACT_REPO: 'docker-repo'
+
+options:
+  machineType: 'N1_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
+  
+timeout: '3600s'
+
+tags:
+  - 'ms-assinatura'
+  - 'gke-deploy'
+  - '${SHORT_SHA}'

@@ -19,7 +19,7 @@ public class RedisConfig {
   /**
    * Configura o template reativo do Redis para serialização de AssinaturaResponse.
    *
-   * @param factory fábrica de conexões reativas do Redis
+   * @param factory      fábrica de conexões reativas do Redis
    * @param objectMapper ObjectMapper configurado pelo Spring Boot (com JavaTimeModule)
    * @return template reativo configurado
    */

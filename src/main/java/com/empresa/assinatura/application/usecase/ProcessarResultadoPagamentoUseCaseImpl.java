@@ -22,9 +22,9 @@ public class ProcessarResultadoPagamentoUseCaseImpl implements ProcessarResultad
 
   public static final String APROVADO = "APROVADO";
   public static final String RECUSADO = "RECUSADO";
-  private final AssinaturaRepositoryPort repositorio;
+  private final AssinaturaRepositoryPort repository;
   private final AssinaturaCachePort cache;
-  private final AssinaturaProducerPort eventPublisher;
+  private final AssinaturaProducerPort assinaturaProducer;
   private final Counter contadorMeterRenovacoesAprovadas;
   private final Counter contadorMeterRenovacoesRecusadas;
   private final Counter contadorMeterAssinaturasSuspensas;
@@ -32,18 +32,18 @@ public class ProcessarResultadoPagamentoUseCaseImpl implements ProcessarResultad
   /**
    * Construtor da classe.
    *
-   * @param repositorio    porta de repositório de assinaturas
+   * @param repository    porta de repositório de assinaturas
    * @param cache          porta de cache de assinaturas
-   * @param eventPublisher porta de publicação de eventos
+   * @param assinaturaProducer porta de publicação de eventos
    * @param meterRegistry  registro de métricas
    */
-  public ProcessarResultadoPagamentoUseCaseImpl(AssinaturaRepositoryPort repositorio,
+  public ProcessarResultadoPagamentoUseCaseImpl(AssinaturaRepositoryPort repository,
       AssinaturaCachePort cache,
-      AssinaturaProducerPort eventPublisher,
+      AssinaturaProducerPort assinaturaProducer,
       MeterRegistry meterRegistry) {
-    this.repositorio = repositorio;
+    this.repository = repository;
     this.cache = cache;
-    this.eventPublisher = eventPublisher;
+    this.assinaturaProducer = assinaturaProducer;
     this.contadorMeterRenovacoesAprovadas = Counter.builder("assinatura.renovacoes.resultado")
         .tag("resultado", APROVADO)
         .description("Total de renovações aprovadas")
@@ -62,7 +62,7 @@ public class ProcessarResultadoPagamentoUseCaseImpl implements ProcessarResultad
   public Mono<Void> processar(PagamentoResultadoEvent evento) {
     log.info("Processando resultado de pagamento: assinaturaId={}, status={}",
         evento.assinaturaId(), evento.status());
-    return repositorio.buscarPorId(evento.assinaturaId())
+    return repository.buscarPorId(evento.assinaturaId())
         .flatMap(assinatura -> renovarAssinatura(evento, assinatura));
   }
 
@@ -96,7 +96,7 @@ public class ProcessarResultadoPagamentoUseCaseImpl implements ProcessarResultad
   }
 
   private Mono<Void> salvarAssinaturaInvalidandoCache(Assinatura assinatura) {
-    return repositorio.salvar(assinatura)
+    return repository.salvar(assinatura)
         .flatMap(salva -> cache.invalidar(salva.getId()));
   }
 
@@ -105,7 +105,7 @@ public class ProcessarResultadoPagamentoUseCaseImpl implements ProcessarResultad
     contadorMeterAssinaturasSuspensas.increment();
     log.warn("Assinatura suspensa após limite de tentativas: id={}", assinatura.getId());
     return salvarAssinaturaInvalidandoCache(assinatura)
-        .then(eventPublisher.publicarAssinaturaSuspensa(assinatura.getId().toString()));
+        .then(assinaturaProducer.publicarAssinaturaSuspensa(assinatura.getId().toString()));
   }
 }
 

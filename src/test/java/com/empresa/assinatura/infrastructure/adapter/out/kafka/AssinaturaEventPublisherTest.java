@@ -26,13 +26,13 @@ class AssinaturaEventPublisherTest {
   private KafkaTemplate<String, Object> kafkaTemplate;
 
   @InjectMocks
-  private AssinaturaProducer publisher;
+  private AssinaturaProducer assinaturaProducer;
 
   @BeforeEach
   void setUp() {
-    ReflectionTestUtils.setField(publisher, "topicoRenovacao", "renovacao-solicitada");
-    ReflectionTestUtils.setField(publisher, "topicoAssinaturaCancelada", "assinatura-cancelada");
-    ReflectionTestUtils.setField(publisher, "topicoAssinaturaSuspensa", "assinatura-suspensa");
+    ReflectionTestUtils.setField(assinaturaProducer, "topicoRenovacao", "renovacao-solicitada");
+    ReflectionTestUtils.setField(assinaturaProducer, "topicoAssinaturaCancelada", "assinatura-cancelada");
+    ReflectionTestUtils.setField(assinaturaProducer, "topicoAssinaturaSuspensa", "assinatura-suspensa");
   }
 
   @Test
@@ -41,7 +41,7 @@ class AssinaturaEventPublisherTest {
     RenovacaoSolicitadaEvent evento = new RenovacaoSolicitadaEvent(
         UUID.randomUUID(), UUID.randomUUID(), "PREMIUM", new BigDecimal("39.90"));
 
-    StepVerifier.create(publisher.publicarRenovacaoSolicitada(evento))
+    StepVerifier.create(assinaturaProducer.publicarRenovacaoSolicitada(evento))
         .verifyComplete();
 
     verify(kafkaTemplate).send(anyString(), anyString(), any());
@@ -52,7 +52,7 @@ class AssinaturaEventPublisherTest {
   void devePublicarAssinaturaCancelada() {
     String assinaturaId = UUID.randomUUID().toString();
 
-    StepVerifier.create(publisher.publicarAssinaturaCancelada(assinaturaId))
+    StepVerifier.create(assinaturaProducer.publicarAssinaturaCancelada(assinaturaId))
         .verifyComplete();
 
     verify(kafkaTemplate).send(anyString(), anyString(), any());
@@ -63,7 +63,7 @@ class AssinaturaEventPublisherTest {
   void devePublicarAssinaturaSuspensa() {
     String assinaturaId = UUID.randomUUID().toString();
 
-    StepVerifier.create(publisher.publicarAssinaturaSuspensa(assinaturaId))
+    StepVerifier.create(assinaturaProducer.publicarAssinaturaSuspensa(assinaturaId))
         .verifyComplete();
 
     verify(kafkaTemplate).send(anyString(), anyString(), any());

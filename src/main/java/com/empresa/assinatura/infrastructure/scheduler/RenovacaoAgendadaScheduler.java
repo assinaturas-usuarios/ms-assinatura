@@ -33,21 +33,21 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 public class RenovacaoAgendadaScheduler {
 
-  private final AssinaturaRepositoryPort repositorio;
+  private final AssinaturaRepositoryPort repository;
   private final RenovarAssinaturaUseCase renovarUseCase;
   private final Counter contadorErrosMeterRenovacao;
 
   /**
    * Construtor da classe RenovacaoAgendada.
    *
-   * @param repositorio      porta de repositório de assinaturas
+   * @param repository      porta de repositório de assinaturas
    * @param renovarUseCase   caso de uso para renovar assinaturas
    * @param meterRegistry    registro de métricas do Micrometer
    */
-  public RenovacaoAgendadaScheduler(AssinaturaRepositoryPort repositorio,
+  public RenovacaoAgendadaScheduler(AssinaturaRepositoryPort repository,
       RenovarAssinaturaUseCase renovarUseCase,
       MeterRegistry meterRegistry) {
-    this.repositorio = repositorio;
+    this.repository = repository;
     this.renovarUseCase = renovarUseCase;
     this.contadorErrosMeterRenovacao = Counter.builder("assinatura.renovacoes.erros")
         .description("Total de erros ao iniciar renovações")
@@ -82,7 +82,7 @@ public class RenovacaoAgendadaScheduler {
   }
 
   private List<Assinatura> buscarAssinaturasParaRenovar(LocalDate hoje) {
-    return repositorio.buscarParaRenovar(hoje)
+    return repository.buscarParaRenovar(hoje)
         .collectList()
         .block(Duration.ofSeconds(30));
   }

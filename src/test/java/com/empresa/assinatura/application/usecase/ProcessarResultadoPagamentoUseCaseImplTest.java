@@ -30,7 +30,7 @@ class ProcessarResultadoPagamentoUseCaseImplTest {
   @Mock
   private AssinaturaCachePort cache;
   @Mock
-  private AssinaturaProducerPort eventPublisher;
+  private AssinaturaProducerPort assinaturaProducer;
 
   private ProcessarResultadoPagamentoUseCaseImpl useCase;
 
@@ -39,7 +39,7 @@ class ProcessarResultadoPagamentoUseCaseImplTest {
 
   @BeforeEach
   void setUp() {
-    useCase = new ProcessarResultadoPagamentoUseCaseImpl(repository, cache, eventPublisher,
+    useCase = new ProcessarResultadoPagamentoUseCaseImpl(repository, cache, assinaturaProducer,
         new SimpleMeterRegistry());
     assinaturaId = UUID.randomUUID();
     assinatura = Assinatura.nova(UUID.randomUUID(), Plano.PREMIUM);
@@ -80,12 +80,12 @@ class ProcessarResultadoPagamentoUseCaseImplTest {
       given(repository.buscarPorId(assinaturaId)).willReturn(Mono.just(assinatura));
       given(repository.salvar(any())).willReturn(Mono.just(assinatura));
       given(cache.invalidar(any())).willReturn(Mono.empty());
-      given(eventPublisher.publicarAssinaturaSuspensa(any())).willReturn(Mono.empty());
+      given(assinaturaProducer.publicarAssinaturaSuspensa(any())).willReturn(Mono.empty());
 
       StepVerifier.create(useCase.processar(evento))
           .verifyComplete();
 
-      verify(eventPublisher).publicarAssinaturaSuspensa(any());
+      verify(assinaturaProducer).publicarAssinaturaSuspensa(any());
     }
   }
 }

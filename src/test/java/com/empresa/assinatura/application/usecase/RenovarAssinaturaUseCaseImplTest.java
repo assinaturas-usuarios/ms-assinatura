@@ -29,7 +29,7 @@ import reactor.test.StepVerifier;
 class RenovarAssinaturaUseCaseImplTest {
 
   @Mock
-  private AssinaturaRepositoryPort repositorio;
+  private AssinaturaRepositoryPort repository;
   @Mock
   private AssinaturaProducerPort eventoPublicador;
 
@@ -40,7 +40,7 @@ class RenovarAssinaturaUseCaseImplTest {
   @BeforeEach
   void setUp() {
     meterRegistry = new SimpleMeterRegistry();
-    useCase = new RenovarAssinaturaUseCaseImpl(repositorio, eventoPublicador, meterRegistry);
+    useCase = new RenovarAssinaturaUseCaseImpl(repository, eventoPublicador, meterRegistry);
     assinatura = Assinatura.nova(UUID.randomUUID(), Plano.PREMIUM);
   }
 
@@ -51,20 +51,20 @@ class RenovarAssinaturaUseCaseImplTest {
     @Test
     @DisplayName("Deve salvar, publicar evento e completar com sucesso")
     void deveRenovarComSucesso() {
-      given(repositorio.salvar(any())).willReturn(Mono.just(assinatura));
+      given(repository.salvar(any())).willReturn(Mono.just(assinatura));
       given(eventoPublicador.publicarRenovacaoSolicitada(any())).willReturn(Mono.empty());
 
       StepVerifier.create(useCase.renovar(assinatura))
           .verifyComplete();
 
-      verify(repositorio).salvar(assinatura);
+      verify(repository).salvar(assinatura);
       verify(eventoPublicador).publicarRenovacaoSolicitada(any(RenovacaoSolicitadaEvent.class));
     }
 
     @Test
     @DisplayName("Deve alterar status da assinatura para AGUARDANDO_RENOVACAO")
     void deveAlterarStatusParaAguardandoRenovacao() {
-      given(repositorio.salvar(any())).willReturn(Mono.just(assinatura));
+      given(repository.salvar(any())).willReturn(Mono.just(assinatura));
       given(eventoPublicador.publicarRenovacaoSolicitada(any())).willReturn(Mono.empty());
 
       useCase.renovar(assinatura).block();
@@ -75,7 +75,7 @@ class RenovarAssinaturaUseCaseImplTest {
     @Test
     @DisplayName("Deve incrementar contador de renovacoes iniciadas apos sucesso")
     void deveIncrementarContadorAoRenovarComSucesso() {
-      given(repositorio.salvar(any())).willReturn(Mono.just(assinatura));
+      given(repository.salvar(any())).willReturn(Mono.just(assinatura));
       given(eventoPublicador.publicarRenovacaoSolicitada(any())).willReturn(Mono.empty());
 
       useCase.renovar(assinatura).block();
@@ -87,7 +87,7 @@ class RenovarAssinaturaUseCaseImplTest {
     @Test
     @DisplayName("Deve propagar erro quando repositorio falhar ao salvar")
     void deveEmitirErroQuandoSalvarFalhar() {
-      given(repositorio.salvar(any()))
+      given(repository.salvar(any()))
           .willReturn(Mono.error(new RuntimeException("erro de banco")));
 
       StepVerifier.create(useCase.renovar(assinatura))
@@ -100,7 +100,7 @@ class RenovarAssinaturaUseCaseImplTest {
     @Test
     @DisplayName("Deve propagar erro quando publicacao do evento falhar")
     void deveEmitirErroQuandoPublicarFalhar() {
-      given(repositorio.salvar(any())).willReturn(Mono.just(assinatura));
+      given(repository.salvar(any())).willReturn(Mono.just(assinatura));
       given(eventoPublicador.publicarRenovacaoSolicitada(any()))
           .willReturn(Mono.error(new RuntimeException("erro de kafka")));
 
@@ -112,7 +112,7 @@ class RenovarAssinaturaUseCaseImplTest {
     @Test
     @DisplayName("Nao deve incrementar contador quando publicacao falhar")
     void naoDeveIncrementarContadorQuandoPublicarFalhar() {
-      given(repositorio.salvar(any())).willReturn(Mono.just(assinatura));
+      given(repository.salvar(any())).willReturn(Mono.just(assinatura));
       given(eventoPublicador.publicarRenovacaoSolicitada(any()))
           .willReturn(Mono.error(new RuntimeException("erro de kafka")));
 

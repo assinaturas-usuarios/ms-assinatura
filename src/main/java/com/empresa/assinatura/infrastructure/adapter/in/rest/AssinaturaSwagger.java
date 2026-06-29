@@ -108,4 +108,5 @@ public interface AssinaturaSwagger {
   })
   Mono<AssinaturaResponse> cancelar(
       @Parameter(description = "ID da assinatura", required = true) @PathVariable UUID id);
+
 }

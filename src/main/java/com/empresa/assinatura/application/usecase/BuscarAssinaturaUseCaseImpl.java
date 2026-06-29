@@ -34,7 +34,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class BuscarAssinaturaUseCaseImpl implements BuscarAssinaturaUseCase {
 
-  private final AssinaturaRepositoryPort repositorio;
+  private final AssinaturaRepositoryPort repository;
   private final AssinaturaCachePort cache;
   private final AssinaturaMapper mapper;
 
@@ -47,7 +47,6 @@ public class BuscarAssinaturaUseCaseImpl implements BuscarAssinaturaUseCase {
   @Override
   @Transactional(readOnly = true)
   public Mono<AssinaturaResponse> buscarPorId(UUID id) {
-    log.info("Buscando assinatura: id={}", id);
     return cache.buscar(id)
         .switchIfEmpty(buscarNoBancoPorId(id));
   }
@@ -55,9 +54,15 @@ public class BuscarAssinaturaUseCaseImpl implements BuscarAssinaturaUseCase {
   @Override
   @Transactional(readOnly = true)
   public Mono<AssinaturaResponse> buscarAtivaDoUsuario(UUID usuarioId) {
+    return cache.buscar(usuarioId)
+        .switchIfEmpty(buscarAtivaDoUsuarioNoBanco(usuarioId));
+  }
+
+  private Mono<AssinaturaResponse> buscarAtivaDoUsuarioNoBanco(UUID usuarioId) {
     log.info("Buscando assinatura ativa do usuario: {}", usuarioId);
-    return repositorio.buscarAtivaDoUsuario(usuarioId)
+    return repository.buscarAtivaDoUsuario(usuarioId)
         .map(mapper::toResponse)
+        .flatMap(armazenarNoCache(usuarioId))
         .switchIfEmpty(Mono.error(new AssinaturaNaoEncontradaException(usuarioId)));
   }
 
@@ -68,14 +73,15 @@ public class BuscarAssinaturaUseCaseImpl implements BuscarAssinaturaUseCase {
     log.info("Listando assinaturas: cursor Id={}, status={}, plano={}, tamanhoPaginaAtual={}",
         cursor, status,
         plano, tamanhoPaginaAtual);
-    return repositorio.listar(cursor, status, plano, tamanhoPaginaAtual + 1)
+    return repository.listar(cursor, status, plano, tamanhoPaginaAtual + 1)
         .map(mapper::toResponse)
         .collectList()
         .map(paginador(tamanhoPaginaAtual));
   }
 
   private Mono<AssinaturaResponse> buscarNoBancoPorId(UUID id) {
-    return repositorio.buscarPorId(id)
+    log.info("Buscando assinatura: id={}", id);
+    return repository.buscarPorId(id)
         .map(mapper::toResponse)
         .flatMap(armazenarNoCache(id))
         .switchIfEmpty(Mono.error(new AssinaturaNaoEncontradaException(id)));

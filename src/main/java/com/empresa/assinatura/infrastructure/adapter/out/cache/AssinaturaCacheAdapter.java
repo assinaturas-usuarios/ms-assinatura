@@ -27,7 +27,7 @@ public class AssinaturaCacheAdapter implements AssinaturaCachePort {
   public Mono<Void> armazenar(UUID assinaturaId, AssinaturaResponse assinatura) {
     String chave = PREFIXO + assinaturaId;
     return redisTemplate.opsForValue().set(chave, assinatura, TTL)
-        .doOnSuccess(r -> log.debug("Assinatura armazenada no cache: {}", assinaturaId))
+        .doOnSuccess(r -> log.info("Assinatura armazenada no cache: {}", assinaturaId))
         .then();
   }
 
@@ -35,14 +35,14 @@ public class AssinaturaCacheAdapter implements AssinaturaCachePort {
   public Mono<AssinaturaResponse> buscar(UUID assinaturaId) {
     String chave = PREFIXO + assinaturaId;
     return redisTemplate.opsForValue().get(chave)
-        .doOnNext(r -> log.debug("Cache hit: {}", assinaturaId));
+        .doOnNext(r -> log.info("Cache hit: {}", assinaturaId));
   }
 
   @Override
   public Mono<Void> invalidar(UUID assinaturaId) {
     String chave = PREFIXO + assinaturaId;
     return redisTemplate.delete(chave)
-        .doOnSuccess(r -> log.debug("Cache invalidado: {}", assinaturaId))
+        .doOnSuccess(r -> log.info("Cache invalidado: {}", assinaturaId))
         .then();
   }
 }

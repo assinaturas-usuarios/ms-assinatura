@@ -1,4 +1,4 @@
-/.idea/
-/target/classes/
-/target/generated-sources/
-/.mvn/
+.idea/
+target/generated-sources/
+.mvn/
+*.class

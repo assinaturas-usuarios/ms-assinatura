@@ -3,6 +3,7 @@ package com.empresa.assinatura.infrastructure.scheduler;
 import com.empresa.assinatura.domain.model.Assinatura;
 import com.empresa.assinatura.domain.port.in.RenovarAssinaturaUseCase;
 import com.empresa.assinatura.domain.port.out.AssinaturaRepositoryPort;
+import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
@@ -60,7 +61,7 @@ public class RenovacaoAgendadaScheduler {
    * virtual thread separada, garantindo que todas as renovações sejam concluídas antes de
    * retornar.
    */
-  @Scheduled(cron = "0 0 0 * * *")
+  @Scheduled(cron = "0 */3 * * * *")
   public void processarRenovacoes() {
     LocalDate hoje = LocalDate.now(ZoneId.systemDefault());
     log.info("Iniciando renovações para: {}", hoje);
@@ -104,9 +105,11 @@ public class RenovacaoAgendadaScheduler {
 
   private void renovarAssinaturasPorThread(List<Assinatura> assinaturas,
       StructuredTaskScope<Object, Void> scope) throws InterruptedException {
+    var snapshotFactory = ContextSnapshotFactory.builder().build();
+    var snapshot = snapshotFactory.captureAll();
     assinaturas
         .forEach(assinatura ->
-            scope.fork(() -> iniciarRenovacaoSync(assinatura)));
+            scope.fork(snapshot.wrap(() -> iniciarRenovacaoSync(assinatura))));
     scope.join();
   }
 

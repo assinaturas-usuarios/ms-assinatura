@@ -14,12 +14,14 @@ public class WebClientConfig {
   /**
    * Cria o WebClient configurado para comunicação com o ms-usuario.
    *
+   * @param webClientBuilder builder gerenciado pelo Spring (com observability/tracing)
    * @param usuarioUrl URL base do ms-usuario
    * @return instância configurada do WebClient
    */
   @Bean
-  public WebClient msUsuarioWebClient(@Value("${ms-usuario.url}") String usuarioUrl) {
-    return WebClient.builder()
+  public WebClient msUsuarioWebClient(WebClient.Builder webClientBuilder,
+      @Value("${ms-usuario.url}") String usuarioUrl) {
+    return webClientBuilder
         .baseUrl(usuarioUrl)
         .build();
   }

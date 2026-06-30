@@ -2,6 +2,7 @@ package com.empresa.assinatura.infrastructure.adapter.in.kafka;
 
 import com.empresa.assinatura.application.dto.PagamentoResultadoEvent;
 import com.empresa.assinatura.domain.port.in.ProcessarResultadoPagamentoUseCase;
+import io.micrometer.context.ContextSnapshotFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -41,6 +42,7 @@ public class PagamentoResultadoConsumer {
         .doOnError(
             erro -> log.error("Erro ao processar resultado: assinaturaId={}", evento.assinaturaId(),
                 erro))
+        .contextWrite(context -> ContextSnapshotFactory.builder().build().captureAll().updateContext(context))
         .subscribe();
   }
 }

@@ -62,7 +62,7 @@ public class RenovarAssinaturaUseCaseImpl implements RenovarAssinaturaUseCase {
     return assinaturaProducer.publicarRenovacaoSolicitada(evento)
         .doOnSuccess(_ -> {
           contadorMeterRenovacoesIniciadas.increment();
-          log.info("Renovação iniciada: assinaturaId={}", salva.getId());
+          log.info("Inicio de Renovação realizada com sucesso: assinaturaId={}", salva.getId());
         });
   }
 }

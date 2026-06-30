@@ -1,6 +1,9 @@
 spring:
   application:
     name: ms-assinatura
+  threads:
+    virtual:
+      enabled: true
 
   r2dbc:
     url: ${DB_URL:r2dbc:postgresql://localhost:5432/assinatura_db}
@@ -23,6 +26,8 @@ spring:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       group-id: assinatura-group
+    listener:
+      observation-enabled: true
 
 kafka:
   topics:
@@ -51,6 +56,9 @@ management:
   tracing:
     sampling:
       probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411/api/v2/spans}
 
 resilience4j:
   circuitbreaker:

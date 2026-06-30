@@ -8,6 +8,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -59,16 +60,19 @@ public class KafkaConfig {
    */
   @Bean
   public KafkaTemplate<String, Object> kafkaTemplate() {
-    return new KafkaTemplate<>(producerFactory());
+    KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(
+        producerFactory());
+    kafkaTemplate.setObservationEnabled(true);
+    return kafkaTemplate;
   }
 
   /**
-   * Configura o ConsumerFactory para consumo de eventos de resultado de pagamento.
+   * Configura o ConsumerFactory para consumo de eventos genéricos, mantendo a desserialização correta.
    *
    * @return fábrica de consumidores Kafka
    */
   @Bean
-  public ConsumerFactory<String, PagamentoResultadoEvent> consumerFactory() {
+  public ConsumerFactory<Object, Object> consumerFactory() {
     Map<String, Object> config = new HashMap<>();
     config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
     config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
@@ -77,20 +81,25 @@ public class KafkaConfig {
 
     JsonDeserializer<PagamentoResultadoEvent> deserializer = new JsonDeserializer<>(
         PagamentoResultadoEvent.class, false);
-    return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
+
+    return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), (JsonDeserializer) deserializer);
   }
 
   /**
-   * Configura o container factory com confirmação manual e tratamento de erros com DLQ.
+   * Configura o container factory com confirmação manual e backoff exponencial.
    *
    * @return container factory para listeners
    */
   @Bean
-  public ConcurrentKafkaListenerContainerFactory<String, PagamentoResultadoEvent>
-          kafkaListenerContainerFactory() {
-    ConcurrentKafkaListenerContainerFactory<String, PagamentoResultadoEvent> factory =
+  public ConcurrentKafkaListenerContainerFactory<Object, Object> kafkaListenerContainerFactory(
+      ConcurrentKafkaListenerContainerFactoryConfigurer configurer,
+      ConsumerFactory<Object, Object> consumerFactory) {
+
+    ConcurrentKafkaListenerContainerFactory<Object, Object> factory =
         new ConcurrentKafkaListenerContainerFactory<>();
-    factory.setConsumerFactory(consumerFactory());
+
+    configurer.configure(factory, consumerFactory);
+
     factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
 
     ExponentialBackOff backOff = new ExponentialBackOff(1000L, 2.0);

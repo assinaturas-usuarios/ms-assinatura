@@ -33,7 +33,7 @@ public class AssinaturaProducer implements AssinaturaProducerPort {
   public Mono<Void> publicarRenovacaoSolicitada(RenovacaoSolicitadaEvent evento) {
     return Mono.fromRunnable(() -> {
           kafkaTemplate.send(topicoRenovacao, evento.assinaturaId().toString(), evento);
-          log.info("Enviando evento de renovação de assinatura ao Kafka com sucesso: {}",
+          log.info("Enviado evento de renovação de assinatura ao Kafka com sucesso: {}",
           evento.assinaturaId()); }
     ).subscribeOn(Schedulers.boundedElastic()).then();
   }
@@ -42,7 +42,7 @@ public class AssinaturaProducer implements AssinaturaProducerPort {
   public Mono<Void> publicarAssinaturaCancelada(String assinaturaId) {
     return Mono.fromRunnable(() -> {
           kafkaTemplate.send(topicoAssinaturaCancelada, assinaturaId, assinaturaId);
-          log.info("Enviando evento de assinatura cancelada ao Kafka com sucesso: {}", assinaturaId);
+          log.info("Enviado evento de assinatura cancelada ao Kafka com sucesso: {}", assinaturaId);
         }
     ).subscribeOn(Schedulers.boundedElastic()).then();
   }
@@ -51,7 +51,7 @@ public class AssinaturaProducer implements AssinaturaProducerPort {
   public Mono<Void> publicarAssinaturaSuspensa(String assinaturaId) {
     return Mono.fromRunnable(() -> {
           kafkaTemplate.send(topicoAssinaturaSuspensa, assinaturaId, assinaturaId);
-          log.info("Enviando evento de assinatura suspensa ao Kafka com sucesso: {}", assinaturaId);
+          log.info("Enviado evento de assinatura suspensa ao Kafka com sucesso: {}", assinaturaId);
         }
     ).subscribeOn(Schedulers.boundedElastic()).then();
   }

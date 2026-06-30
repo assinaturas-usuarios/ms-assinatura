@@ -167,6 +167,10 @@
       <groupId>io.micrometer</groupId>
     </dependency>
     <dependency>
+      <artifactId>context-propagation</artifactId>
+      <groupId>io.micrometer</groupId>
+    </dependency>
+    <dependency>
       <artifactId>zipkin-reporter-brave</artifactId>
       <groupId>io.zipkin.reporter2</groupId>
     </dependency>

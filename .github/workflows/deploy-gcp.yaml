@@ -36,7 +36,6 @@ jobs:
 
       - name: Build and Push Docker image
         run: |
-          # Formato correto: HOST/PROJECT_ID/REPOSITORY/IMAGE:TAG
           IMAGE_PATH="${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
           
           echo "Building image: $IMAGE_PATH"
@@ -48,20 +47,20 @@ jobs:
           echo "IMAGE_NAME=$IMAGE_PATH" >> $GITHUB_ENV
 
       - name: Deploy to Cloud Run
-              run: |
-                gcloud run deploy ${{ env.SERVICE_NAME }} \
-                  --image ${{ env.IMAGE_NAME }} \
-                  --region ${{ env.REGION }} \
-                  --platform managed \
-                  --allow-unauthenticated \
-                  --set-env-vars="SPRING_PROFILES_ACTIVE=cloud" \
-                  --port 8082 \
-                  --add-cloudsql-instances="project-f27c5714-ec0c-4985-a97:us-central1:assinaturas-postgres" \
-                  --vpc-connector="conector-cloud-run" \
-                  --set-env-vars="SPRING_PROFILES_ACTIVE=cloud,\
-                                  DB_FLYWAY_URL=jdbc:postgresql:///:assinatura_db?cloudSqlInstance=project-f27c5714-ec0c-4985-a97:us-central1:assinaturas-postgres&socketFactory=com.google.cloud.sql.postgres.SocketFactory,\
-                                  DB_USERNAME=admin,\
-                                  DB_PASSWORD=${{ secrets.DB_PASSWORD }},\
-                                  REDIS_HOST=10.181.93.59,\
-                                  REDIS_PORT=6379" \
-                  --timeout 300
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.IMAGE_NAME }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars="SPRING_PROFILES_ACTIVE=cloud" \
+            --port 8082 \
+            --add-cloudsql-instances="project-f27c5714-ec0c-4985-a97:us-central1:assinaturas-postgres" \
+            --vpc-connector="conector-cloud-run" \
+            --set-env-vars="SPRING_PROFILES_ACTIVE=cloud,\
+                            DB_FLYWAY_URL=jdbc:postgresql:///:assinatura_db?cloudSqlInstance=project-f27c5714-ec0c-4985-a97:us-central1:assinaturas-postgres&socketFactory=com.google.cloud.sql.postgres.SocketFactory,\
+                            DB_USERNAME=admin,\
+                            DB_PASSWORD=${{ secrets.DB_PASSWORD }},\
+                            REDIS_HOST=10.181.93.59,\
+                            REDIS_PORT=6379" \
+            --timeout 300

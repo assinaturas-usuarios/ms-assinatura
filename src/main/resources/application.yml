@@ -40,7 +40,7 @@ ms-usuario:
   url: ${MS_USUARIO_URL:http://localhost:8081}
 
 server:
-  port: 8082
+  port: ${PORT:8082}
 
 springdoc:
   api-docs:

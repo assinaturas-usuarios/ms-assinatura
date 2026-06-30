@@ -49,11 +49,12 @@ jobs:
           echo "IMAGE_NAME=$IMAGE_PATH" >> $GITHUB_ENV
 
       - name: Deploy to Cloud Run
-        run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image ${{ env.IMAGE_NAME }} \
-            --region ${{ env.REGION }} \
-            --platform managed \
-            --allow-unauthenticated \
-            --set-env-vars="SPRING_PROFILES_ACTIVE=cloud" \
-            --port 8082
+              run: |
+                gcloud run deploy ${{ env.SERVICE_NAME }} \
+                  --image ${{ env.IMAGE_NAME }} \
+                  --region ${{ env.REGION }} \
+                  --platform managed \
+                  --allow-unauthenticated \
+                  --set-env-vars="SPRING_PROFILES_ACTIVE=cloud" \
+                  --port 8082 \
+                  --timeout 300

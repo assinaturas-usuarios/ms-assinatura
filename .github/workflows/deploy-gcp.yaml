@@ -54,12 +54,14 @@ jobs:
             --platform managed \
             --allow-unauthenticated \
             --port 8082 \
+            --timeout 300 \
             --add-cloudsql-instances="project-f27c5714-ec0c-4985-a97:us-central1:assinaturas-postgres" \
-            --vpc-connector="conector-cloud-run" \
+            --network="default" \
+            --subnet="default" \
+            --vpc-egress="private-ranges-only" \
             --set-env-vars="SPRING_PROFILES_ACTIVE=cloud,\
                             DB_FLYWAY_URL=jdbc:postgresql:///:assinatura_db?cloudSqlInstance=project-f27c5714-ec0c-4985-a97:us-central1:assinaturas-postgres&socketFactory=com.google.cloud.sql.postgres.SocketFactory,\
                             DB_USERNAME=admin,\
                             DB_PASSWORD=${{ secrets.DB_PASSWORD }},\
                             REDIS_HOST=10.181.93.59,\
-                            REDIS_PORT=6379" \
-            --timeout 300
+                            REDIS_PORT=6379"

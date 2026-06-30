@@ -33,13 +33,20 @@ jobs:
           registry: ${{ env.ARTIFACT_REGISTRY }}
           username: _json_key
           password: ${{ secrets.GCP_SA_KEY }}
-          
+
       - name: Build and Push Docker image
         run: |
-          IMAGE_NAME="${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
-          docker build -t $IMAGE_NAME .
-          docker push $IMAGE_NAME
-          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+          # Formato correto: HOST/PROJECT_ID/REPOSITORY/IMAGE:TAG
+          IMAGE_PATH="${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
+          
+          echo "Building image: $IMAGE_PATH"
+          docker build -t $IMAGE_PATH .
+          
+          echo "Pushing image..."
+          docker push $IMAGE_PATH
+          
+          # Salva o caminho completo para o próximo passo usar
+          echo "IMAGE_NAME=$IMAGE_PATH" >> $GITHUB_ENV
 
       - name: Deploy to Cloud Run
         run: |

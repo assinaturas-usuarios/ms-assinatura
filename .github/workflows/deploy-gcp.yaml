@@ -45,7 +45,6 @@ jobs:
           echo "Pushing image..."
           docker push $IMAGE_PATH
           
-          # Salva o caminho completo para o próximo passo usar
           echo "IMAGE_NAME=$IMAGE_PATH" >> $GITHUB_ENV
 
       - name: Deploy to Cloud Run
@@ -64,5 +63,5 @@ jobs:
                                   DB_USERNAME=admin,\
                                   DB_PASSWORD=${{ secrets.DB_PASSWORD }},\
                                   REDIS_HOST=10.181.93.59,\
-                                  REDIS_PORT=6379"
+                                  REDIS_PORT=6379" \
                   --timeout 300

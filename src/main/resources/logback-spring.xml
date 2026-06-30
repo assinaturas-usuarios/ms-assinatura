@@ -7,7 +7,7 @@
   </appender>
 
   <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-    <destination>${LOGSTASH_HOST:-logstash}:5000</destination>
+    <destination>${LOGSTASH_HOST:-logstash}:${LOGSTASH_PORT:-5000}</destination>
     <reconnectionDelay>10 seconds</reconnectionDelay>
     <encoder class="net.logstash.logback.encoder.LogstashEncoder">
       <includeMdcKeyName>traceId</includeMdcKeyName>

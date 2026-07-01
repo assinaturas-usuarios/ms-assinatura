@@ -64,6 +64,7 @@ public class KafkaConfig {
   public KafkaTemplate<String, Object> kafkaTemplate() {
     KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(
         producerFactory());
+    kafkaTemplate.setObservationEnabled(true);
     return kafkaTemplate;
   }
 

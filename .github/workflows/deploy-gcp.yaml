@@ -61,12 +61,12 @@ jobs:
             --subnet="default" \
             --vpc-egress="private-ranges-only" \
             --set-env-vars="SPRING_PROFILES_ACTIVE=cloud,\
-                            DB_FLYWAY_URL=r2dbc:postgresql://${{secrets.DB_URL}}:${{secrets.DB_PORT}}/assinatura_db,\
-                            DB_URL=r2dbc:postgresql://${{secrets.DB_URL}}:${{secrets.DB_PORT}}/assinatura_db,\
+                            DB_FLYWAY_URL=jdbc:postgresql://${{ secrets.DB_URL }}:${{ secrets.DB_PORT }}/assinatura_db,\
+                            DB_URL=r2dbc:postgresql://${{ secrets.DB_URL }}:${{ secrets.DB_PORT }}/assinatura_db,\
                             DB_USERNAME=postgres,\
                             DB_PASSWORD=${{ secrets.DB_PASSWORD }},\
                             REDIS_HOST=10.181.93.59,\
                             REDIS_PORT=6379,\
-                            KAFKA_BOOTSTRAP_SERVERS=${{secrets.KAFKA_BOOTSTRAP_SERVERS}},\
+                            KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},\
                             LOGSTASH_HOST=logstash-service-791247002252.us-central1.run.app,\
                             LOGSTASH_PORT=443"\

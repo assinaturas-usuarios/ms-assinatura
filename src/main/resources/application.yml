@@ -28,6 +28,9 @@ spring:
       group-id: assinatura-group
     listener:
       observation-enabled: true
+    admin:
+      properties:
+        allow-auto-create-topics: false
 
 cloud:
   sql:

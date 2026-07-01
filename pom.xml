@@ -228,11 +228,10 @@
       <groupId>com.google.cloud.sql</groupId>
       <artifactId>postgres-socket-factory</artifactId>
       <version>1.15.0</version>
-    </dependency>
+    </dependency>    
     <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-gcp-starter-sql-postgres</artifactId>
-      <version>1.8.4</version>
+      <groupId>org.postgresql</groupId>
+      <artifactId>r2dbc-postgresql</artifactId>
     </dependency>
   </dependencies>
   <groupId>com.empresa</groupId>

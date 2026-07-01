@@ -16,6 +16,7 @@ com\empresa\assinatura\application\usecase\ProcessarResultadoPagamentoUseCaseImp
 com\empresa\assinatura\infrastructure\mapper\AssinaturaMapperImpl.class
 com\empresa\assinatura\application\dto\AssinaturaResponse.class
 com\empresa\assinatura\infrastructure\adapter\out\kafka\AssinaturaProducer.class
+com\empresa\assinatura\infrastructure\config\KafkaConfig$1.class
 com\empresa\assinatura\application\dto\CursorListaResponse.class
 com\empresa\assinatura\AssinaturaApplication.class
 com\empresa\assinatura\infrastructure\config\R2dbcCloudConfig.class

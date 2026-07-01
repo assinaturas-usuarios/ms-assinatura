@@ -3,6 +3,7 @@ package com.empresa.assinatura.infrastructure.config;
 import com.empresa.assinatura.application.dto.PagamentoResultadoEvent;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -63,8 +65,15 @@ public class KafkaConfig {
     KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(
         producerFactory());
     kafkaTemplate.setObservationEnabled(true);
-    kafkaTemplate.setClusterId("ms-assinatura");
     return kafkaTemplate;
+  }
+
+  @Bean
+  public KafkaAdmin kafkaAdmin() {
+    return new KafkaAdmin(Map.of(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)) {
+      @Override
+      public String clusterId() { return "ms-assinatura"; }
+    };
   }
 
   /**

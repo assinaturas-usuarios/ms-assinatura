@@ -22,6 +22,8 @@ import org.springframework.context.annotation.Profile;
 @Profile("cloud")
 public class R2dbcCloudConfig {
 
+  public static final String SEP = "/";
+  public static final String SUFIXO_SOCKET_CLOUD = "/.s.PGSQL.5432";
   @Value("${cloud.sql.socket-path:/cloudsql}")
   private String socketBasePath;
 
@@ -41,7 +43,7 @@ public class R2dbcCloudConfig {
    */
   @Bean
   public ConnectionFactory connectionFactory() {
-    String socketPath = socketBasePath + "/" + cloudSqlInstance;
+    String socketPath = socketBasePath + SEP + cloudSqlInstance + SUFIXO_SOCKET_CLOUD;
 
     PostgresqlConnectionConfiguration config = PostgresqlConnectionConfiguration.builder()
         .socket(socketPath)

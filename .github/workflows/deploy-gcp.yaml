@@ -69,4 +69,5 @@ jobs:
                             REDIS_PORT=6379,\
                             KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},\
                             LOGSTASH_HOST=logstash-service-791247002252.us-central1.run.app,\
-                            LOGSTASH_PORT=443"
+                            LOGSTASH_PORT=443,\
+                            SERVER_FORWARD_HEADERS_STRATEGY=framework"

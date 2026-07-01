@@ -60,6 +60,7 @@ jobs:
             --network="default" \
             --subnet="default" \
             --vpc-egress="private-ranges-only" \
+            --memory 1Gi \
             --set-env-vars="SPRING_PROFILES_ACTIVE=cloud,\
                             DB_FLYWAY_URL=jdbc:postgresql:///assinatura_db?cloudSqlInstance=${{ secrets.CLOUD_SQL_INSTANCE }}&socketFactory=com.google.cloud.sql.postgres.SocketFactory,\
                             DB_URL=r2dbc:postgres://${{ secrets.DB_URL }}:${{ secrets.DB_PORT }}/assinatura_db,\
@@ -70,4 +71,6 @@ jobs:
                             KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},\
                             LOGSTASH_HOST=logstash-service-791247002252.us-central1.run.app,\
                             LOGSTASH_PORT=443,\
-                            SERVER_FORWARD_HEADERS_STRATEGY=framework"
+                            SERVER_FORWARD_HEADERS_STRATEGY=framework, \
+                            MANAGEMENT_TRACING_ENABLED=false,\
+                            SPRING_ZIPKIN_ENABLED=false"

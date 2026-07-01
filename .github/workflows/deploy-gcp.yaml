@@ -72,4 +72,5 @@ jobs:
                             SERVER_FORWARD_HEADERS_STRATEGY=framework,\
                             MANAGEMENT_TRACING_ENABLED=false,\
                             SPRING_FLYWAY_BASELINE_ON_MIGRATE=true,\
-                            SPRING_ZIPKIN_ENABLED=false"
+                            SPRING_ZIPKIN_ENABLED=false,\
+                            MS_USUARIO_URL=https://ms-usuario-791247002252.us-central1.run.app"

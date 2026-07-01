@@ -106,8 +106,10 @@ class BuscarAssinaturaUseCaseImplTest {
     @DisplayName("Deve retornar assinatura ativa do usuario")
     void deveRetornarAssinaturaAtiva() {
       UUID usuarioId = UUID.randomUUID();
+      given(cache.buscar(usuarioId)).willReturn(Mono.empty());
       given(repository.buscarAtivaDoUsuario(usuarioId)).willReturn(Mono.just(assinatura));
       given(mapper.toResponse(assinatura)).willReturn(response);
+      given(cache.armazenar(any(), any())).willReturn(Mono.empty());
 
       StepVerifier.create(useCase.buscarAtivaDoUsuario(usuarioId))
           .expectNext(response)
@@ -118,6 +120,7 @@ class BuscarAssinaturaUseCaseImplTest {
     @DisplayName("Deve emitir erro quando usuario nao tem assinatura ativa")
     void deveEmitirErroQuandoNaoHaAssinaturaAtiva() {
       UUID usuarioId = UUID.randomUUID();
+      given(cache.buscar(usuarioId)).willReturn(Mono.empty());
       given(repository.buscarAtivaDoUsuario(usuarioId)).willReturn(Mono.empty());
 
       StepVerifier.create(useCase.buscarAtivaDoUsuario(usuarioId))
@@ -142,7 +145,7 @@ class BuscarAssinaturaUseCaseImplTest {
       StepVerifier.create(useCase.listar(null, null, null, 2))
           .assertNext(pagina -> {
             assertThat(pagina.itens()).hasSize(1);
-            assertThat(pagina.temMais()).isFalse();
+            assertThat(pagina.hasNext()).isFalse();
             assertThat(pagina.proximoCursor()).isNull();
           })
           .verifyComplete();
@@ -171,7 +174,7 @@ class BuscarAssinaturaUseCaseImplTest {
       StepVerifier.create(useCase.listar(null, null, null, 2))
           .assertNext(pagina -> {
             assertThat(pagina.itens()).hasSize(2);
-            assertThat(pagina.temMais()).isTrue();
+            assertThat(pagina.hasNext()).isTrue();
             assertThat(pagina.proximoCursor()).isEqualTo(id2.toString());
           })
           .verifyComplete();

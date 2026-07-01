@@ -23,7 +23,6 @@ com\empresa\assinatura\infrastructure\exception\AssinaturaNaoCancelaveException.
 com\empresa\assinatura\domain\port\out\AssinaturaProducerPort.class
 com\empresa\assinatura\infrastructure\config\SchedulerConfig.class
 com\empresa\assinatura\infrastructure\exception\AssinaturaNaoEncontradaException.class
-com\empresa\assinatura\infrastructure\adapter\out\error\ErrorResponse$Builder.class
 com\empresa\assinatura\infrastructure\adapter\out\persistence\AssinaturaEntity$AssinaturaEntityBuilder.class
 com\empresa\assinatura\application\usecase\BuscarAssinaturaUseCaseImpl.class
 com\empresa\assinatura\application\dto\RenovacaoSolicitadaEvent.class
@@ -45,7 +44,6 @@ com\empresa\assinatura\infrastructure\adapter\in\kafka\PagamentoResultadoConsume
 com\empresa\assinatura\infrastructure\adapter\out\persistence\AssinaturaR2dbcRepository.class
 com\empresa\assinatura\infrastructure\config\KafkaConfig.class
 com\empresa\assinatura\infrastructure\adapter\in\rest\AssinaturaController.class
-com\empresa\assinatura\infrastructure\adapter\out\error\ErrorResponse.class
 com\empresa\assinatura\infrastructure\adapter\out\cache\AssinaturaCacheAdapter.class
 com\empresa\assinatura\infrastructure\config\RedisConfig.class
 com\empresa\assinatura\domain\port\in\RenovarAssinaturaUseCase.class

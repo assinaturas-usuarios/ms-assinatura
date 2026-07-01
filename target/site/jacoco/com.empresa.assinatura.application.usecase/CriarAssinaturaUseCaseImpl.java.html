@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CriarAssinaturaUseCaseImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-assinatura</a> &gt; <a href="index.source.html" class="el_package">com.empresa.assinatura.application.usecase</a> &gt; <span class="el_source">CriarAssinaturaUseCaseImpl.java</span></div><h1>CriarAssinaturaUseCaseImpl.java</h1><pre class="source lang-java linenums">package com.empresa.assinatura.application.usecase;
+
+import com.empresa.assinatura.application.dto.AssinaturaResponse;
+import com.empresa.assinatura.application.dto.CriarAssinaturaRequest;
+import com.empresa.assinatura.domain.model.Assinatura;
+import com.empresa.assinatura.domain.model.Plano;
+import com.empresa.assinatura.domain.port.in.CriarAssinaturaUseCase;
+import com.empresa.assinatura.domain.port.out.AssinaturaCachePort;
+import com.empresa.assinatura.domain.port.out.AssinaturaRepositoryPort;
+import com.empresa.assinatura.domain.port.out.UsuarioClientPort;
+import com.empresa.assinatura.infrastructure.exception.AssinaturaJaAtivaException;
+import com.empresa.assinatura.infrastructure.exception.PlanoInvalidoException;
+import com.empresa.assinatura.infrastructure.exception.UsuarioNaoEncontradoException;
+import com.empresa.assinatura.infrastructure.mapper.AssinaturaMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
+
+/**
+ * Implementação do caso de uso para criar uma nova assinatura.
+ */
+@Service
+@RequiredArgsConstructor
+<span class="fc" id="L26">@Slf4j</span>
+public class CriarAssinaturaUseCaseImpl implements CriarAssinaturaUseCase {
+
+  private final AssinaturaRepositoryPort repository;
+  private final UsuarioClientPort usuarioClient;
+  private final AssinaturaCachePort cache;
+  private final AssinaturaMapper mapper;
+
+  @Override
+  @Transactional
+  public Mono&lt;AssinaturaResponse&gt; criar(CriarAssinaturaRequest request) {
+<span class="fc" id="L37">    log.info(&quot;Criando assinatura para usuário: {}, plano: {}&quot;, request.usuarioId(),</span>
+<span class="fc" id="L38">        request.plano());</span>
+<span class="fc" id="L39">    return criarComValidacoes(request)</span>
+<span class="fc" id="L40">        .flatMap(this::armazenarNoCache)</span>
+<span class="fc" id="L41">        .doOnSuccess(this::logCriacao);</span>
+  }
+
+  private Mono&lt;AssinaturaResponse&gt; criarComValidacoes(CriarAssinaturaRequest request) {
+<span class="fc" id="L45">    Plano plano = Plano.fromNome(request.plano())</span>
+<span class="pc" id="L46">        .orElseThrow(() -&gt; new PlanoInvalidoException(request.plano()));</span>
+<span class="fc" id="L47">    return validarCriacaoAssinatura(request)</span>
+<span class="fc" id="L48">        .flatMap(_ -&gt; repository.salvar(Assinatura.nova(request.usuarioId(), plano)))</span>
+<span class="fc" id="L49">        .map(mapper::toResponse);</span>
+  }
+
+  private Mono&lt;Boolean&gt; validarCriacaoAssinatura(CriarAssinaturaRequest request) {
+<span class="fc" id="L53">    return buscarValidandoSeUsuarioExiste(request)</span>
+<span class="fc" id="L54">        .flatMap(_ -&gt; repository.existeAssinaturaAtiva(request.usuarioId()))</span>
+<span class="fc" id="L55">        .flatMap(possuiAtiva -&gt; validarAssinaturaUnica(possuiAtiva, request));</span>
+  }
+
+  private Mono&lt;Boolean&gt; buscarValidandoSeUsuarioExiste(CriarAssinaturaRequest request) {
+<span class="fc" id="L59">    return usuarioClient.existePorId(request.usuarioId())</span>
+<span class="fc" id="L60">        .flatMap(existeUsuario -&gt; validarExistenciaUsuario(existeUsuario, request));</span>
+  }
+
+  private Mono&lt;AssinaturaResponse&gt; armazenarNoCache(AssinaturaResponse response) {
+<span class="fc" id="L64">    return cache.armazenar(response.id(), response).thenReturn(response);</span>
+  }
+
+  private void logCriacao(AssinaturaResponse response) {
+<span class="fc" id="L68">    log.info(&quot;Assinatura criada com sucesso: id={}&quot;, response.id());</span>
+<span class="fc" id="L69">  }</span>
+
+  private Mono&lt;Boolean&gt; validarExistenciaUsuario(Boolean existe, CriarAssinaturaRequest request) {
+<span class="fc bfc" id="L72" title="All 2 branches covered.">    if (Boolean.FALSE.equals(existe)) {</span>
+<span class="fc" id="L73">      return Mono.error(new UsuarioNaoEncontradoException(request.usuarioId()));</span>
+    }
+<span class="fc" id="L75">    return Mono.just(true);</span>
+  }
+
+  private Mono&lt;Boolean&gt; validarAssinaturaUnica(Boolean possuiAtiva,
+      CriarAssinaturaRequest request) {
+<span class="fc bfc" id="L80" title="All 2 branches covered.">    if (Boolean.TRUE.equals(possuiAtiva)) {</span>
+<span class="fc" id="L81">      return Mono.error(new AssinaturaJaAtivaException(request.usuarioId()));</span>
+    }
+<span class="fc" id="L83">    return Mono.just(false);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

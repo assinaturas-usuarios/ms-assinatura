@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CancelarAssinaturaUseCaseImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-assinatura</a> &gt; <a href="index.source.html" class="el_package">com.empresa.assinatura.application.usecase</a> &gt; <span class="el_source">CancelarAssinaturaUseCaseImpl.java</span></div><h1>CancelarAssinaturaUseCaseImpl.java</h1><pre class="source lang-java linenums">package com.empresa.assinatura.application.usecase;
+
+import com.empresa.assinatura.application.dto.AssinaturaResponse;
+import com.empresa.assinatura.domain.model.Assinatura;
+import com.empresa.assinatura.domain.model.StatusAssinatura;
+import com.empresa.assinatura.domain.port.in.CancelarAssinaturaUseCase;
+import com.empresa.assinatura.domain.port.out.AssinaturaCachePort;
+import com.empresa.assinatura.domain.port.out.AssinaturaProducerPort;
+import com.empresa.assinatura.domain.port.out.AssinaturaRepositoryPort;
+import com.empresa.assinatura.infrastructure.exception.AssinaturaNaoCancelaveException;
+import com.empresa.assinatura.infrastructure.exception.AssinaturaNaoEncontradaException;
+import com.empresa.assinatura.infrastructure.mapper.AssinaturaMapper;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
+
+/**
+ * Implementação do caso de uso para cancelar uma assinatura.
+ *
+ * &lt;b&gt;Event-Driven Architecture:&lt;/b&gt; após o cancelamento, o evento {@code assinatura.cancelada} é publicado no Kafka via
+ * {@code EventPublisherPort}, possibilitando notificação de outros microsserviços interessados.
+ *
+ * &lt;p&gt;&lt;b&gt;Cache Reativo:&lt;/b&gt; o cancelamento invalida a entrada no Redis, garantindo consistência entre banco e cache.
+ */
+@Service
+@RequiredArgsConstructor
+<span class="fc" id="L30">@Slf4j</span>
+public class CancelarAssinaturaUseCaseImpl implements CancelarAssinaturaUseCase {
+
+  private final AssinaturaRepositoryPort repository;
+  private final AssinaturaCachePort cache;
+  private final AssinaturaProducerPort eventPublish;
+  private final AssinaturaMapper mapper;
+
+  @Override
+  @Transactional
+  public Mono&lt;AssinaturaResponse&gt; cancelar(UUID id) {
+<span class="fc" id="L41">    log.info(&quot;Cancelando assinatura: id={}&quot;, id);</span>
+<span class="fc" id="L42">    return repository.buscarPorId(id)</span>
+<span class="fc" id="L43">        .switchIfEmpty(assinaturaNaoEncontrada(id))</span>
+<span class="fc" id="L44">        .flatMap(this::cancelarConvertendoParaResponse)</span>
+<span class="fc" id="L45">        .flatMap(this::invalidarCacheComPublisher)</span>
+<span class="fc" id="L46">        .doOnSuccess(this::logCancelamento);</span>
+  }
+
+  private Mono&lt;AssinaturaResponse&gt; cancelarConvertendoParaResponse(Assinatura assinatura) {
+<span class="fc" id="L50">    return salvarCancelamentoAssinatura(assinatura).map(mapper::toResponse);</span>
+  }
+
+  private Mono&lt;AssinaturaResponse&gt; invalidarCacheComPublisher(AssinaturaResponse response) {
+<span class="fc" id="L54">    return cache.invalidar(response.id())</span>
+<span class="fc" id="L55">        .then(eventPublish.publicarAssinaturaCancelada(response.id().toString()))</span>
+<span class="fc" id="L56">        .thenReturn(response);</span>
+  }
+
+  private void logCancelamento(AssinaturaResponse response) {
+<span class="fc" id="L60">    log.info(&quot;Assinatura cancelada: id={}&quot;, response.id());</span>
+<span class="fc" id="L61">  }</span>
+
+  private &lt;T&gt; Mono&lt;T&gt; assinaturaNaoEncontrada(UUID id) {
+<span class="fc" id="L64">    return Mono.error(new AssinaturaNaoEncontradaException(id));</span>
+  }
+
+  private Mono&lt;Assinatura&gt; salvarCancelamentoAssinatura(Assinatura assinatura) {
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    if (StatusAssinatura.CANCELADA.equals(assinatura.getStatus())) {</span>
+<span class="fc" id="L69">      return Mono.error(new AssinaturaNaoCancelaveException(assinatura.getId()));</span>
+    }
+<span class="fc" id="L71">    assinatura.cancelar();</span>
+<span class="fc" id="L72">    return repository.salvar(assinatura);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

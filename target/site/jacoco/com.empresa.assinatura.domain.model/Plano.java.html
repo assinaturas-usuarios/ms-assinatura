@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Plano.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-assinatura</a> &gt; <a href="index.source.html" class="el_package">com.empresa.assinatura.domain.model</a> &gt; <span class="el_source">Plano.java</span></div><h1>Plano.java</h1><pre class="source lang-java linenums">package com.empresa.assinatura.domain.model;
+
+import java.math.BigDecimal;
+import java.util.Optional;
+
+/**
+ * Enumeração que representa os diferentes planos de assinatura disponíveis, cada um com seu valor
+ * associado.
+ */
+<span class="fc" id="L10">public enum Plano {</span>
+
+<span class="fc" id="L12">  BASICO(new BigDecimal(&quot;19.90&quot;)),</span>
+<span class="fc" id="L13">  PREMIUM(new BigDecimal(&quot;39.90&quot;)),</span>
+<span class="fc" id="L14">  FAMILIA(new BigDecimal(&quot;59.90&quot;));</span>
+
+  private final BigDecimal valor;
+
+<span class="fc" id="L18">  Plano(BigDecimal valor) {</span>
+<span class="fc" id="L19">    this.valor = valor;</span>
+<span class="fc" id="L20">  }</span>
+
+  /**
+   * Retorna o plano correspondente ao nome fornecido, ignorando maiúsculas e minúsculas.
+   *
+   * @param nome o nome do plano
+   * @return um Optional contendo o plano correspondente, ou vazio se não houver correspondência
+   */
+  public static Optional&lt;Plano&gt; fromNome(String nome) {
+    try {
+<span class="fc" id="L30">      return Optional.of(valueOf(nome.toUpperCase()));</span>
+<span class="nc" id="L31">    } catch (IllegalArgumentException _) {</span>
+<span class="nc" id="L32">      return Optional.empty();</span>
+    }
+  }
+
+  public BigDecimal getValor() {
+<span class="fc" id="L37">    return valor;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

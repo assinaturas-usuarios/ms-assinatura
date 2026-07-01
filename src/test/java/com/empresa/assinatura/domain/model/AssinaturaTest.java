@@ -114,4 +114,70 @@ class AssinaturaTest {
       assertThat(assinatura.isRenovacaoEmAndamento()).isFalse();
     }
   }
+
+  @Nested
+  @DisplayName("Iniciar renovação")
+  class IniciarRenovacao {
+
+    @Test
+    @DisplayName("Deve alterar status para AGUARDANDO_RENOVACAO ao iniciar renovação")
+    void deveAlterarStatusParaAguardandoRenovacao() {
+      Assinatura assinatura = Assinatura.nova(UUID.randomUUID(), Plano.PREMIUM);
+
+      assinatura.iniciarRenovacao();
+
+      assertThat(assinatura.getStatus()).isEqualTo(StatusAssinatura.AGUARDANDO_RENOVACAO);
+      assertThat(assinatura.isRenovacaoEmAndamento()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve registrar data de início da renovação")
+    void deveRegistrarDataInicioRenovacao() {
+      Assinatura assinatura = Assinatura.nova(UUID.randomUUID(), Plano.BASICO);
+
+      assinatura.iniciarRenovacao();
+
+      assertThat(assinatura.getDataInicioRenovacao()).isNotNull();
+    }
+  }
+
+  @Nested
+  @DisplayName("Está ativa")
+  class EstaAtiva {
+
+    @Test
+    @DisplayName("Deve retornar true quando assinatura está ATIVA")
+    void deveRetornarTrueQuandoAtiva() {
+      Assinatura assinatura = Assinatura.nova(UUID.randomUUID(), Plano.PREMIUM);
+
+      assertThat(assinatura.estaAtiva()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve retornar false quando assinatura está CANCELADA")
+    void deveRetornarFalseQuandoCancelada() {
+      Assinatura assinatura = Assinatura.nova(UUID.randomUUID(), Plano.BASICO);
+      assinatura.cancelar();
+
+      assertThat(assinatura.estaAtiva()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve retornar false quando assinatura está SUSPENSA")
+    void deveRetornarFalseQuandoSuspensa() {
+      Assinatura assinatura = Assinatura.nova(UUID.randomUUID(), Plano.FAMILIA);
+      assinatura.suspender();
+
+      assertThat(assinatura.estaAtiva()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve retornar false quando assinatura está AGUARDANDO_RENOVACAO")
+    void deveRetornarFalseQuandoAguardandoRenovacao() {
+      Assinatura assinatura = Assinatura.nova(UUID.randomUUID(), Plano.PREMIUM);
+      assinatura.iniciarRenovacao();
+
+      assertThat(assinatura.estaAtiva()).isFalse();
+    }
+  }
 }

@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.validation.BindingResult;
@@ -88,6 +89,15 @@ class GlobalExceptionHandlerTest {
     when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError));
     ProblemDetail result = handler.handleValidacao(webExchangeEx);
     assertThat(result.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
+  }
+
+  @Test
+  @DisplayName("503 para DataAccessException")
+  void deveRetornar503ParaErroDatabase() {
+    DataAccessException ex = new DataAccessException("erro de banco") {};
+    ProblemDetail result = handler.handleDataAccessException(ex);
+    assertThat(result.getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
+    assertThat(result.getTitle()).contains("Banco de Dados");
   }
 
   @Test

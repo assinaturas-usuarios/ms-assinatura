@@ -1,0 +1,13 @@
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\test\java\com\empresa\assinatura\application\usecase\BuscarAssinaturaUseCaseImplTest.java
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\test\java\com\empresa\assinatura\application\usecase\CancelarAssinaturaUseCaseImplTest.java
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\test\java\com\empresa\assinatura\application\usecase\CriarAssinaturaUseCaseImplTest.java
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\test\java\com\empresa\assinatura\application\usecase\ProcessarResultadoPagamentoUseCaseImplTest.java
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\test\java\com\empresa\assinatura\application\usecase\RenovarAssinaturaUseCaseImplTest.java
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\test\java\com\empresa\assinatura\domain\model\AssinaturaTest.java
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\test\java\com\empresa\assinatura\infrastructure\adapter\in\kafka\PagamentoResultadoConsumerTest.java
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\test\java\com\empresa\assinatura\infrastructure\adapter\in\rest\AssinaturaControllerTest.java
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\test\java\com\empresa\assinatura\infrastructure\adapter\out\cache\AssinaturaCacheAdapterTest.java
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\test\java\com\empresa\assinatura\infrastructure\adapter\out\kafka\AssinaturaEventPublisherTest.java
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\test\java\com\empresa\assinatura\infrastructure\adapter\out\persistence\AssinaturaPersistenceAdapterTest.java
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\test\java\com\empresa\assinatura\infrastructure\handler\GlobalExceptionHandlerTest.java
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\test\java\com\empresa\assinatura\infrastructure\scheduler\RenovacaoAgendadaSchedulerTest.java

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProcessarResultadoPagamentoUseCaseImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-assinatura</a> &gt; <a href="index.source.html" class="el_package">com.empresa.assinatura.application.usecase</a> &gt; <span class="el_source">ProcessarResultadoPagamentoUseCaseImpl.java</span></div><h1>ProcessarResultadoPagamentoUseCaseImpl.java</h1><pre class="source lang-java linenums">package com.empresa.assinatura.application.usecase;
+
+import com.empresa.assinatura.application.dto.PagamentoResultadoEvent;
+import com.empresa.assinatura.domain.model.Assinatura;
+import com.empresa.assinatura.domain.port.in.ProcessarResultadoPagamentoUseCase;
+import com.empresa.assinatura.domain.port.out.AssinaturaCachePort;
+import com.empresa.assinatura.domain.port.out.AssinaturaProducerPort;
+import com.empresa.assinatura.domain.port.out.AssinaturaRepositoryPort;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
+
+/**
+ * Implementação do caso de uso para processar o resultado de um pagamento.
+ */
+@Service
+<span class="fc" id="L20">@Slf4j</span>
+public class ProcessarResultadoPagamentoUseCaseImpl implements ProcessarResultadoPagamentoUseCase {
+
+  public static final String APROVADO = &quot;APROVADO&quot;;
+  public static final String RECUSADO = &quot;RECUSADO&quot;;
+  private final AssinaturaRepositoryPort repository;
+  private final AssinaturaCachePort cache;
+  private final AssinaturaProducerPort assinaturaProducer;
+  private final Counter contadorMeterRenovacoesAprovadas;
+  private final Counter contadorMeterRenovacoesRecusadas;
+  private final Counter contadorMeterAssinaturasSuspensas;
+
+  /**
+   * Construtor da classe.
+   *
+   * @param repository    porta de repositório de assinaturas
+   * @param cache          porta de cache de assinaturas
+   * @param assinaturaProducer porta de publicação de eventos
+   * @param meterRegistry  registro de métricas
+   */
+  public ProcessarResultadoPagamentoUseCaseImpl(AssinaturaRepositoryPort repository,
+      AssinaturaCachePort cache,
+      AssinaturaProducerPort assinaturaProducer,
+<span class="fc" id="L43">      MeterRegistry meterRegistry) {</span>
+<span class="fc" id="L44">    this.repository = repository;</span>
+<span class="fc" id="L45">    this.cache = cache;</span>
+<span class="fc" id="L46">    this.assinaturaProducer = assinaturaProducer;</span>
+<span class="fc" id="L47">    this.contadorMeterRenovacoesAprovadas = Counter.builder(&quot;assinatura.renovacoes.resultado&quot;)</span>
+<span class="fc" id="L48">        .tag(&quot;resultado&quot;, APROVADO)</span>
+<span class="fc" id="L49">        .description(&quot;Total de renovações aprovadas&quot;)</span>
+<span class="fc" id="L50">        .register(meterRegistry);</span>
+<span class="fc" id="L51">    this.contadorMeterRenovacoesRecusadas = Counter.builder(&quot;assinatura.renovacoes.resultado&quot;)</span>
+<span class="fc" id="L52">        .tag(&quot;resultado&quot;, RECUSADO)</span>
+<span class="fc" id="L53">        .description(&quot;Total de renovações recusadas&quot;)</span>
+<span class="fc" id="L54">        .register(meterRegistry);</span>
+<span class="fc" id="L55">    this.contadorMeterAssinaturasSuspensas = Counter.builder(&quot;assinatura.suspensas.total&quot;)</span>
+<span class="fc" id="L56">        .description(&quot;Total de assinaturas suspensas por falha de renovação&quot;)</span>
+<span class="fc" id="L57">        .register(meterRegistry);</span>
+<span class="fc" id="L58">  }</span>
+
+  @Override
+  @Transactional
+  public Mono&lt;Void&gt; processar(PagamentoResultadoEvent evento) {
+<span class="fc" id="L63">    log.info(&quot;Processando resultado de pagamento: assinaturaId={}, status={}&quot;,</span>
+<span class="fc" id="L64">        evento.assinaturaId(), evento.status());</span>
+<span class="fc" id="L65">    return repository.buscarPorId(evento.assinaturaId())</span>
+<span class="fc" id="L66">        .flatMap(assinatura -&gt; renovarAssinatura(evento, assinatura));</span>
+  }
+
+  private Mono&lt;Void&gt; renovarAssinatura(PagamentoResultadoEvent evento, Assinatura assinatura) {
+<span class="fc bfc" id="L70" title="All 2 branches covered.">    if (APROVADO.equals(evento.status())) {</span>
+<span class="fc" id="L71">      return tratarAprovacaoAssinatura(assinatura);</span>
+    }
+<span class="fc" id="L73">    return registrarFalhaRenovacaoAssinatura(assinatura);</span>
+  }
+
+  private Mono&lt;Void&gt; tratarAprovacaoAssinatura(Assinatura assinatura) {
+<span class="fc" id="L77">    assinatura.renovar();</span>
+<span class="fc" id="L78">    contadorMeterRenovacoesAprovadas.increment();</span>
+<span class="fc" id="L79">    log.info(&quot;Assinatura renovada com sucesso: id={}&quot;, assinatura.getId());</span>
+<span class="fc" id="L80">    return salvarAssinaturaInvalidandoCache(assinatura);</span>
+  }
+
+  private Mono&lt;Void&gt; registrarFalhaRenovacaoAssinatura(Assinatura assinatura) {
+<span class="fc" id="L84">    assinatura.registrarFalhaRenovacao();</span>
+<span class="fc" id="L85">    contadorMeterRenovacoesRecusadas.increment();</span>
+<span class="fc" id="L86">    log.warn(&quot;Falha na renovação: assinaturaId={}, tentativas={}&quot;, assinatura.getId(),</span>
+<span class="fc" id="L87">        assinatura.getTentativasRenovacao());</span>
+<span class="fc" id="L88">    return tratarFalhaRenovacao(assinatura);</span>
+  }
+
+  private Mono&lt;Void&gt; tratarFalhaRenovacao(Assinatura assinatura) {
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">    if (assinatura.atingiuLimiteTentativas()) {</span>
+<span class="fc" id="L93">      return suspenderAssinaturaAposTentativasRenovacao(assinatura);</span>
+    }
+<span class="nc" id="L95">    return salvarAssinaturaInvalidandoCache(assinatura);</span>
+  }
+
+  private Mono&lt;Void&gt; salvarAssinaturaInvalidandoCache(Assinatura assinatura) {
+<span class="fc" id="L99">    return repository.salvar(assinatura)</span>
+<span class="fc" id="L100">        .flatMap(salva -&gt; cache.invalidar(salva.getId()));</span>
+  }
+
+  private Mono&lt;Void&gt; suspenderAssinaturaAposTentativasRenovacao(Assinatura assinatura) {
+<span class="fc" id="L104">    assinatura.suspender();</span>
+<span class="fc" id="L105">    contadorMeterAssinaturasSuspensas.increment();</span>
+<span class="fc" id="L106">    log.warn(&quot;Assinatura suspensa após limite de tentativas: id={}&quot;, assinatura.getId());</span>
+<span class="fc" id="L107">    return salvarAssinaturaInvalidandoCache(assinatura)</span>
+<span class="fc" id="L108">        .then(assinaturaProducer.publicarAssinaturaSuspensa(assinatura.getId().toString()));</span>
+  }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

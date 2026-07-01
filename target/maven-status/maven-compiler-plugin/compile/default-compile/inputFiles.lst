@@ -26,7 +26,6 @@ C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\emp
 C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\adapter\in\rest\AssinaturaSwagger.java
 C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\adapter\out\cache\AssinaturaCacheAdapter.java
 C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\adapter\out\client\UsuarioWebClient.java
-C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\adapter\out\error\ErrorResponse.java
 C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\adapter\out\kafka\AssinaturaProducer.java
 C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\adapter\out\persistence\AssinaturaEntity.java
 C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\adapter\out\persistence\AssinaturaPersistenceAdapter.java

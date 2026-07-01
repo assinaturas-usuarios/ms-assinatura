@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PagamentoResultadoConsumer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-assinatura</a> &gt; <a href="index.source.html" class="el_package">com.empresa.assinatura.infrastructure.adapter.in.kafka</a> &gt; <span class="el_source">PagamentoResultadoConsumer.java</span></div><h1>PagamentoResultadoConsumer.java</h1><pre class="source lang-java linenums">package com.empresa.assinatura.infrastructure.adapter.in.kafka;
+
+import com.empresa.assinatura.application.dto.PagamentoResultadoEvent;
+import com.empresa.assinatura.domain.port.in.ProcessarResultadoPagamentoUseCase;
+import io.micrometer.context.ContextSnapshotFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Component;
+
+/**
+ * Componente que consome eventos de resultado de pagamento do Kafka e delega o processamento para o
+ * caso de uso apropriado.
+ */
+@Component
+@RequiredArgsConstructor
+<span class="fc" id="L19">@Slf4j</span>
+public class PagamentoResultadoConsumer {
+
+  private final ProcessarResultadoPagamentoUseCase useCase;
+
+  /**
+   * Método que consome eventos de resultado de pagamento do Kafka.
+   *
+   * @param evento evento com o resultado do pagamento
+   * @param ack    objeto para confirmação de processamento
+   */
+  @KafkaListener(
+      topics = &quot;${kafka.topics.pagamento-resultado}&quot;,
+      groupId = &quot;${spring.kafka.consumer.group-id}&quot;,
+      containerFactory = &quot;kafkaListenerContainerFactory&quot;
+  )
+  public void consumir(@Payload PagamentoResultadoEvent evento, Acknowledgment ack) {
+<span class="fc" id="L36">    log.info(&quot;Recebendo resultado de pagamento via Consumer Kafka: assinaturaId={}&quot;, evento.assinaturaId());</span>
+<span class="fc" id="L37">    useCase.processar(evento)</span>
+<span class="fc" id="L38">        .doOnSuccess(_ -&gt; {</span>
+<span class="fc" id="L39">          ack.acknowledge();</span>
+<span class="fc" id="L40">          log.info(&quot;Resultado processado e ack confirmado: assinaturaId={}&quot;, evento.assinaturaId());</span>
+<span class="fc" id="L41">        })</span>
+<span class="fc" id="L42">        .doOnError(</span>
+<span class="fc" id="L43">            erro -&gt; log.error(&quot;Erro ao processar resultado: assinaturaId={}&quot;, evento.assinaturaId(),</span>
+                erro))
+<span class="fc" id="L45">        .contextWrite(context -&gt; ContextSnapshotFactory.builder().build().captureAll().updateContext(context))</span>
+<span class="fc" id="L46">        .subscribe();</span>
+<span class="fc" id="L47">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

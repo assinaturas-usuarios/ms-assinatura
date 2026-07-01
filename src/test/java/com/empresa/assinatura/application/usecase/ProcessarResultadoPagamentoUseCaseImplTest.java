@@ -42,7 +42,12 @@ class ProcessarResultadoPagamentoUseCaseImplTest {
     useCase = new ProcessarResultadoPagamentoUseCaseImpl(repository, cache, assinaturaProducer,
         new SimpleMeterRegistry());
     assinaturaId = UUID.randomUUID();
-    assinatura = Assinatura.nova(UUID.randomUUID(), Plano.PREMIUM);
+    UUID usuarioId = UUID.randomUUID();
+    assinatura = Assinatura.nova(usuarioId, Plano.PREMIUM);
+    // Criar assinatura com ID para testes (simulando objeto do banco)
+    assinatura = new Assinatura(assinaturaId, usuarioId, Plano.PREMIUM,
+        java.time.LocalDate.now(), java.time.LocalDate.now().plusMonths(1),
+        com.empresa.assinatura.domain.model.StatusAssinatura.ATIVA, 0, false, null, null);
   }
 
   @Nested

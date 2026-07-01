@@ -31,6 +31,6 @@ ms-assinatura,com.empresa.assinatura.infrastructure.exception,PlanoInvalidoExcep
 ms-assinatura,com.empresa.assinatura.infrastructure.adapter.out.kafka,AssinaturaProducer,0,70,0,0,0,16,0,7,0,7
 ms-assinatura,com.empresa.assinatura.domain.model,Plano,3,49,0,0,2,9,0,4,0,4
 ms-assinatura,com.empresa.assinatura.domain.model,StatusAssinatura,0,27,0,0,0,5,0,1,0,1
-ms-assinatura,com.empresa.assinatura.domain.model,Assinatura,3,146,0,2,1,46,1,19,1,18
+ms-assinatura,com.empresa.assinatura.domain.model,Assinatura,3,146,0,2,1,45,1,19,1,18
 ms-assinatura,com.empresa.assinatura.infrastructure.mapper,AssinaturaMapperImpl,184,0,6,0,57,0,7,0,4,0
 ms-assinatura,com.empresa.assinatura.infrastructure.adapter.out.client,UsuarioWebClient,41,0,0,0,10,0,4,0,4,0

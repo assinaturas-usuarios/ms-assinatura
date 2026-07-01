@@ -51,7 +51,7 @@ public class Assinatura {
   public static Assinatura nova(UUID usuarioId, Plano plano) {
     LocalDate hoje = LocalDate.now(ZoneId.systemDefault());
     return new Assinatura(
-        UUID.randomUUID(), usuarioId, plano,
+        null, usuarioId, plano,
         hoje, hoje.plusMonths(1),
         StatusAssinatura.ATIVA, 0, false, null, null
     );

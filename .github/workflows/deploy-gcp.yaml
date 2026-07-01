@@ -60,7 +60,8 @@ jobs:
             --network="default" \
             --subnet="default" \
             --vpc-egress="private-ranges-only" \
-            --memory 1Gi \
+            --memory 2Gi \
+            --no-cpu-throttling \
             --set-env-vars="SPRING_PROFILES_ACTIVE=cloud,\
                             JAVA_TOOL_OPTIONS=-Xms256m -Xmx512m,\
                             DB_FLYWAY_URL=jdbc:postgresql:///assinatura_db?cloudSqlInstance=${{ secrets.CLOUD_SQL_INSTANCE }}&socketFactory=com.google.cloud.sql.postgres.SocketFactory,\

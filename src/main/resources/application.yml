@@ -24,11 +24,21 @@ spring:
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: "true"
     consumer:
       group-id: assinatura-group
     listener:
       observation-enabled: true
+    template:
+      observation-enabled: true
     admin:
+      fail-fast: false
       properties:
         allow-auto-create-topics: false
 

@@ -64,17 +64,9 @@ public class KafkaConfig {
   public KafkaTemplate<String, Object> kafkaTemplate() {
     KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(
         producerFactory());
-    kafkaTemplate.setObservationEnabled(true);
     return kafkaTemplate;
   }
 
-  @Bean
-  public KafkaAdmin kafkaAdmin() {
-    return new KafkaAdmin(Map.of(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)) {
-      @Override
-      public String clusterId() { return "ms-assinatura"; }
-    };
-  }
 
   /**
    * Configura o ConsumerFactory para consumo de eventos genéricos, mantendo a desserialização correta.

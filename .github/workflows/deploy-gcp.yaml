@@ -47,26 +47,26 @@ jobs:
           echo "IMAGE_NAME=$IMAGE_PATH" >> $GITHUB_ENV
 
       - name: Deploy to Cloud Run
-              run: |
-                gcloud run deploy ${{ env.SERVICE_NAME }} \
-                  --image ${{ env.IMAGE_NAME }} \
-                  --region ${{ env.REGION }} \
-                  --platform managed \
-                  --allow-unauthenticated \
-                  --port 8082 \
-                  --timeout 300 \
-                  --add-cloudsql-instances="${{ secrets.CLOUD_SQL_INSTANCE }}" \
-                  --clear-vpc-connector \
-                  --network="default" \
-                  --subnet="default" \
-                  --vpc-egress="private-ranges-only" \
-                  --set-env-vars="SPRING_PROFILES_ACTIVE=cloud,\
-                                  DB_FLYWAY_URL=jdbc:postgresql:///assinatura_db?cloudSqlInstance=${{ secrets.CLOUD_SQL_INSTANCE }}&socketFactory=com.google.cloud.sql.postgres.SocketFactory,\
-                                  DB_URL=r2dbc:gcp:postgres://${{ secrets.CLOUD_SQL_INSTANCE }}/assinatura_db,\
-                                  DB_USERNAME=postgres,\
-                                  DB_PASSWORD=${{ secrets.DB_PASSWORD }},\
-                                  REDIS_HOST=10.181.93.59,\
-                                  REDIS_PORT=6379,\
-                                  KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},\
-                                  LOGSTASH_HOST=logstash-service-791247002252.us-central1.run.app,\
-                                  LOGSTASH_PORT=443"
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.IMAGE_NAME }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --port 8082 \
+            --timeout 300 \
+            --add-cloudsql-instances="${{ secrets.CLOUD_SQL_INSTANCE }}" \
+            --clear-vpc-connector \
+            --network="default" \
+            --subnet="default" \
+            --vpc-egress="private-ranges-only" \
+            --set-env-vars="SPRING_PROFILES_ACTIVE=cloud,\
+                            DB_FLYWAY_URL=jdbc:postgresql:///assinatura_db?cloudSqlInstance=${{ secrets.CLOUD_SQL_INSTANCE }}&socketFactory=com.google.cloud.sql.postgres.SocketFactory,\
+                            DB_URL=r2dbc:gcp:postgres://${{ secrets.CLOUD_SQL_INSTANCE }}/assinatura_db,\
+                            DB_USERNAME=postgres,\
+                            DB_PASSWORD=${{ secrets.DB_PASSWORD }},\
+                            REDIS_HOST=10.181.93.59,\
+                            REDIS_PORT=6379,\
+                            KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},\
+                            LOGSTASH_HOST=logstash-service-791247002252.us-central1.run.app,\
+                            LOGSTASH_PORT=443"

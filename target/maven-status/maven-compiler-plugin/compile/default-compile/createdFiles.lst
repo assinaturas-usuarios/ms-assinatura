@@ -18,6 +18,7 @@ com\empresa\assinatura\application\dto\AssinaturaResponse.class
 com\empresa\assinatura\infrastructure\adapter\out\kafka\AssinaturaProducer.class
 com\empresa\assinatura\application\dto\CursorListaResponse.class
 com\empresa\assinatura\AssinaturaApplication.class
+com\empresa\assinatura\infrastructure\config\R2dbcCloudConfig.class
 com\empresa\assinatura\domain\port\out\AssinaturaRepositoryPort.class
 com\empresa\assinatura\infrastructure\exception\AssinaturaNaoCancelaveException.class
 com\empresa\assinatura\domain\port\out\AssinaturaProducerPort.class

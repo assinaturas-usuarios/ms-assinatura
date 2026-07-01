@@ -32,6 +32,7 @@ C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\emp
 C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\adapter\out\persistence\AssinaturaR2dbcRepository.java
 C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\config\CorsConfig.java
 C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\config\KafkaConfig.java
+C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\config\R2dbcCloudConfig.java
 C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\config\ReactorTracingConfig.java
 C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\config\RedisConfig.java
 C:\Users\luana\Downloads\assinatura-usuarios\ms-assinatura\src\main\java\com\empresa\assinatura\infrastructure\config\SchedulerConfig.java

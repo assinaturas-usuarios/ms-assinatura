@@ -29,6 +29,10 @@ spring:
     listener:
       observation-enabled: true
 
+cloud:
+  sql:
+    instance: ${CLOUD_SQL_INSTANCE:}
+
 kafka:
   topics:
     renovacao-solicitada: assinatura.renovacao.solicitada

@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import reactor.core.publisher.Mono;
 
 /**
  * Agendador de renovações de assinatura.
@@ -57,45 +58,42 @@ public class RenovacaoAgendadaScheduler {
 
   /**
    * Método agendado para processar as renovações de assinaturas vencendo na data atual. Executa
-   * diariamente à meia-noite, buscando assinaturas para renovar e processando cada uma em uma
+   * a cada 10 minutos (para testes), buscando assinaturas para renovar e processando cada uma em uma
    * virtual thread separada, garantindo que todas as renovações sejam concluídas antes de
    * retornar.
    */
-  @Scheduled(cron = "0 */3 * * * *")
+  @Scheduled(cron = "0 */10 * * * *")
   public void processarRenovacoes() {
     LocalDate hoje = LocalDate.now(ZoneId.systemDefault());
     log.info("Iniciando renovações para: {}", hoje);
 
-    List<Assinatura> assinaturas = buscarAssinaturasParaRenovar(hoje);
-    if (CollectionUtils.isEmpty(assinaturas)) {
-      log.info("Nenhuma assinatura para renovar em {}", hoje);
-      return;
-    }
+    buscarAssinaturasParaRenovar(hoje)
+        .subscribe(listaAssinaturas -> {
+          if (CollectionUtils.isEmpty(listaAssinaturas)) {
+            log.info("Nenhuma assinatura para renovar em {}", hoje);
+            return;
+          }
 
-    log.info("Processando {} renovações via StructuredTaskScope + virtual threads",
-        assinaturas.size());
+          log.info("Processando {} renovações via StructuredTaskScope + virtual threads",
+              listaAssinaturas.size());
 
-    if (!threadsDeRenovacaoExecutadasComSucesso(assinaturas)) {
-      return;
-    }
+          threadsDeRenovacaoExecutadasComSucesso(listaAssinaturas);
+          log.info("Processamento de renovações concluído para {}", hoje);
+        });
 
-    log.info("Processamento de renovações concluído para {}", hoje);
   }
 
-  private List<Assinatura> buscarAssinaturasParaRenovar(LocalDate hoje) {
+  private Mono<List<Assinatura>> buscarAssinaturasParaRenovar(LocalDate hoje) {
     return repository.buscarParaRenovar(hoje)
-        .collectList()
-        .block(Duration.ofSeconds(30));
+        .collectList();
   }
 
-  private boolean threadsDeRenovacaoExecutadasComSucesso(List<Assinatura> assinaturas) {
+  private void threadsDeRenovacaoExecutadasComSucesso(List<Assinatura> assinaturas) {
     try (var scope = StructuredTaskScope.open()) {
       renovarAssinaturasPorThread(assinaturas, scope);
     } catch (InterruptedException e) {
       interromperThreadPorExcecao(e);
-      return false;
     }
-    return true;
   }
 
   private static void interromperThreadPorExcecao(InterruptedException e) {
@@ -115,7 +113,8 @@ public class RenovacaoAgendadaScheduler {
 
   private void iniciarRenovacaoSync(Assinatura assinatura) {
     try {
-      renovarUseCase.renovar(assinatura).block(Duration.ofSeconds(10));
+      renovarUseCase.renovar(assinatura)
+          .subscribe();
     } catch (Exception e) {
       contadorErrosMeterRenovacao.increment();
       log.error("Erro ao iniciar renovação: assinaturaId={}", assinatura.getId(), e);

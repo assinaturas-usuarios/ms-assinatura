@@ -63,6 +63,7 @@ public class KafkaConfig {
     KafkaTemplate<String, Object> kafkaTemplate = new KafkaTemplate<>(
         producerFactory());
     kafkaTemplate.setObservationEnabled(true);
+    kafkaTemplate.setClusterId("ms-assinatura");
     return kafkaTemplate;
   }
 

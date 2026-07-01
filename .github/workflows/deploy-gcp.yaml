@@ -61,7 +61,7 @@ jobs:
             --set-env-vars="SPRING_PROFILES_ACTIVE=cloud,\
                             JAVA_TOOL_OPTIONS=-Xms256m -Xmx512m,\
                             DB_FLYWAY_URL=jdbc:postgresql:///assinatura_db?cloudSqlInstance=${{ secrets.CLOUD_SQL_INSTANCE }}&socketFactory=com.google.cloud.sql.postgres.SocketFactory,\
-                            DB_URL=r2dbc:postgresql://localhost/assinatura_db?cloudSqlInstance=${{ secrets.CLOUD_SQL_INSTANCE }}&socketFactory=com.google.cloud.sql.postgres.SocketFactory,\
+                            DB_URL=r2dbc:postgresql:///assinatura_db?cloudSqlInstance=${{ secrets.CLOUD_SQL_INSTANCE }},\
                             DB_USERNAME=postgres,\
                             DB_PASSWORD=${{ secrets.DB_PASSWORD }},\
                             REDIS_HOST=10.181.93.59,\

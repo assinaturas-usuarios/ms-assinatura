@@ -237,6 +237,11 @@
       <groupId>io.r2dbc</groupId>
       <artifactId>r2dbc-pool</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.google.cloud.hosted.kafka</groupId>
+      <artifactId>managed-kafka-auth-login-handler</artifactId>
+      <version>1.0.5</version>
+    </dependency>
   </dependencies>
   <groupId>com.empresa</groupId>
   <modelVersion>4.0.0</modelVersion>
